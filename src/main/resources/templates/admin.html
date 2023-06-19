@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <title>UsersPage</title>
+</head>
+<body>
+<h1 th:text="${titleAdmin}"/>
+<table class="table">
+  <thead>
+  <tr>
+    <th scope="col">ID</th>
+    <th scope="col">First Name</th>
+    <th scope="col">Last Name</th>
+    <th scope="col">Age</th>
+    <th scope="col">Role</th>
+    <th scope="col">Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="user : ${users}">
+
+    <td th:text="${user.getId()}">
+    <td th:text="${user.getName()}">
+    <td th:text="${user.getLastName()}">
+    <td th:text="${user.getAge()}">
+    <td th:text="${user.getUsername()}">
+    <td>
+      <form th:action="@{/admin/(id=${user.getId()})}" target="_self">
+        <input type="hidden" name="id" th:value="${user.getId()}"/>
+        <button type="submit">Go to the user's page</button>
+      </form>
+
+      <form th:method="GET" th:action="@{/admin/editUser}" target="_self">
+        <input type="hidden" name="id" th:value="${user.getId()}"/>
+        <button type="submit">Update</button>
+      </form>
+
+      <form th:method="DELETE" th:action="@{/admin/delete}">
+        <input type="hidden" name="id" th:value="${user.getId()}"/>
+        <button type="submit">Delete</button>
+      </form>
+
+    </td>
+  </tr>
+  </tbody>
+</table>
+<br>
+<div sec:authorize="hasAuthority('ROLE_ADMIN')">
+  <form action="/admin/addUser" target="_self">
+    <button>Add a new User</button>
+  </form>
+  <br>
+</div>
+<form th:action="@{/logout}" th:method="POST" target="_self">
+  <button>Exit</button>
+</form>
+</body>
+</html>
