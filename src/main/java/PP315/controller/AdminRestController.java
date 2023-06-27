@@ -27,7 +27,6 @@ public class AdminRestController {
 
     }
 
-
     @PostMapping
     public ResponseEntity<HttpStatus> addNewUser(@RequestBody User user) {
         userService.addUser(user);
