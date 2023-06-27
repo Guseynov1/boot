@@ -1,43 +1,45 @@
-const id_del = document.getElementById('id_del');
-const name_del = document.getElementById('name_del');
-const lastname_del = document.getElementById('lastname_del');
-const age_del = document.getElementById('age_del');
-const email_del = document.getElementById('email_del');
-const role_del = document.getElementById("delete-role")
-const deleteModal = document.getElementById("deleteModal");
-const closeDeleteButton = document.getElementById("closeDelete")
-const bsDeleteModal = new bootstrap.Modal(deleteModal);
+const form_new = document.getElementById('formForNewUser');
+const role_new = document.querySelector('#roles').selectedOptions;
 
-async function deleteModalData(id) {
-    const  urlForDel = 'api/admins/users/' + id;
-    let usersPageDel = await fetch(urlForDel);
-    if (usersPageDel.ok) {
-        let userData =
-            await usersPageDel.json().then(user => {
-                id_del.value = `${user.id}`;
-                name_del.value = `${user.firstName}`;
-                lastname_del.value = `${user.lastName}`;
-                age_del.value = `${user.age}`;
-                email_del.value = `${user.email}`;
-                role_del.value = user.roles.map(r=>r.rolename).join(", ");
-            })
+form_new.addEventListener('submit', addNewUser);
 
-        bsDeleteModal.show();
-    } else {
-        alert(`Error, ${usersPageDel.status}`)
+async function addNewUser(event) {
+    event.preventDefault();
+    const urlNew = 'api/admins/users/';
+    let listOfRole = [];
+    for (let i = 0; i < role_new.length; i++) {
+        listOfRole.push({
+            id:role_new[i].value
+        });
     }
-}
-async function deleteUser() {
-    let urlDel = 'api/admins/users/' + id_del.value;
     let method = {
-        method: 'DELETE',
+        method: 'POST',
         headers: {
             "Content-Type": "application/json"
-        }
+        },
+        body: JSON.stringify({
+            firstName: form_new.firstname.value,
+            lastName: form_new.lastname.value,
+            age: form_new.age.value,
+            email: form_new.email.value,
+            password: form_new.password.value,
+            roles: listOfRole
+        })
     }
-
-    fetch(urlDel, method).then(() => {
-        closeDeleteButton.click();
+    await fetch(urlNew,method).then(() => {
+        form_new.reset();
         getAdminPage();
-    })
+        const triggerTabList = [].slice.call(document.querySelectorAll('#Admin_panel-tab a'))
+        triggerTabList.forEach(function (triggerEl) {
+            const tabTrigger = new bootstrap.Tab(triggerEl)
+
+            triggerEl.addEventListener('click', function (event) {
+                event.preventDefault()
+                tabTrigger.show()
+            })
+        })
+        const triggerEl = document.querySelector('#Admin_panel-tab a[href="#user_table"]')
+        bootstrap.Tab.getInstance(triggerEl).show() // Select tab by name
+    });
+
 }
